@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sales Data Analysis System — Case Study</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --accent: #c84b2f;
+    --accent2: #2d6a4f;
+    --gold: #d4a017;
+    --muted: #6b6254;
+    --card-bg: #fffdf7;
+    --border: #d6cfc0;
+    --code-bg: #1a1a2e;
+    --code-text: #a8dadc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Lato', sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── PAGES ───────────────────────────────── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── HERO ───────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, var(--border) 39px, var(--border) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, var(--border) 39px, var(--border) 40px),
+      var(--paper);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,75,47,0.08) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    margin-bottom: 28px;
+    border-radius: 2px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--ink);
+    max-width: 800px;
+    animation: fadeUp 0.7s 0.15s ease both;
+  }
+
+  .hero h1 span { color: var(--accent); font-style: italic; }
+
+  .hero-sub {
+    font-family: 'Lato', sans-serif;
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-top: 20px;
+    max-width: 560px;
+    font-weight: 300;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  /* ── TEAM CREDITS BAND ─────────────────── */
+  .team-band {
+    display: flex;
+    gap: 20px;
+    margin-top: 36px;
+    animation: fadeUp 0.7s 0.4s ease both;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .team-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 20px 8px 8px;
+    backdrop-filter: blur(6px);
+  }
+
+  .team-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .team-info .name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .team-info .role {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 40px;
+    animation: fadeUp 0.7s 0.55s ease both;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-meta-item { text-align: center; }
+
+  .hero-meta-item .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero-meta-item .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    animation: fadeUp 1s 0.8s ease both;
+  }
+
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+    animation: scrollLine 1.5s ease-in-out infinite;
+  }
+
+  /* ── LAYOUT ─────────────────────────────── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  section { padding: 96px 28px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 48px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    max-width: 650px;
+  }
+
+  /* ── OVERVIEW ───────────────────────────── */
+  .overview {
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .overview::before {
+    content: '📊';
+    position: absolute;
+    font-size: 22rem;
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.04;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .overview .section-label { color: var(--gold); }
+  .overview .section-label::after { background: var(--gold); }
+  .overview .section-title { color: var(--paper); }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 48px;
+  }
+
+  .overview-text {
+    font-size: 1.05rem;
+    color: #c8bfaf;
+    line-height: 1.8;
+  }
+
+  .overview-text p + p { margin-top: 16px; }
+  .overview-text strong { color: var(--gold); }
+
+  .overview-features {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .feature-chip {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 14px 18px;
+    transition: background 0.25s;
+  }
+
+  .feature-chip:hover { background: rgba(255,255,255,0.09); }
+
+  .feature-chip .icon { font-size: 1.4rem; flex-shrink: 0; }
+  .feature-chip .text { font-size: 0.92rem; color: #d6cfc0; }
+  .feature-chip .text strong { color: var(--paper); display: block; font-size: 0.97rem; }
+
+  /* ── STRUCTURE ──────────────────────────── */
+  .structure { background: var(--card-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+  .file-tree {
+    background: var(--code-bg);
+    border-radius: 10px;
+    padding: 28px 32px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    color: #cdd6f4;
+    line-height: 2;
+    margin-top: 40px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .file-tree::before {
+    content: 'Project Structure';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.05);
+    padding: 8px 32px;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .file-tree .content { margin-top: 28px; }
+
+  .ft-folder { color: #89b4fa; }
+  .ft-py     { color: #a6e3a1; }
+  .ft-txt    { color: #f9e2af; }
+  .ft-md     { color: #cba6f7; }
+  .ft-data   { color: #fab387; }
+  .ft-note   { color: #6c7086; font-size: 0.76rem; }
+
+  /* ── PIPELINE ───────────────────────────── */
+  .pipeline { background: var(--paper); }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .step-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    cursor: pointer;
+  }
+
+  .step-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+    border-color: var(--accent);
+  }
+
+  .step-card::before {
+    content: attr(data-num);
+    position: absolute;
+    top: -10px; right: 18px;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: rgba(200,75,47,0.07);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .step-icon { font-size: 1.8rem; margin-bottom: 12px; }
+
+  .step-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .step-card h3 span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .step-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
+
+  .step-card .tag-row {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    display: inline-block;
+    background: rgba(200,75,47,0.08);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(200,75,47,0.2);
+  }
+
+  .click-hint {
+    margin-top: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.7;
+  }
+
+  /* ── LIBRARIES ──────────────────────────── */
+  .libraries { background: var(--card-bg); border-top: 1px solid var(--border); }
+
+  .libs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-top: 48px;
+  }
+
+  .lib-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  .lib-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(200,75,47,0.12);
+    transform: translateY(-3px);
+  }
+
+  .lib-icon {
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .lib-card h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .lib-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.55; }
+
+  .lib-card .click-hint {
+    margin-top: 10px;
+    font-size: 0.6rem;
+  }
+
+  /* ── HOW TO USE ─────────────────────────── */
+  .howto { background: var(--paper); }
+
+  .steps-list { margin-top: 48px; }
+
+  .howto-step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .howto-step:first-child { border-top: 1px solid var(--border); }
+
+  .step-num {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .howto-step h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+  .howto-step p  { font-size: 0.92rem; color: var(--muted); margin-bottom: 10px; }
+
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    padding: 14px 20px;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.9;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-block .comment { color: #6272a4; }
+  .code-block .cmd     { color: #50fa7b; }
+
+  /* ── COLUMNS ─────────────────────────────── */
+  .columns { background: var(--ink); color: var(--paper); }
+  .columns .section-title { color: var(--paper); }
+  .columns .section-label { color: var(--gold); }
+  .columns .section-label::after { background: var(--gold); }
+
+  .col-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 40px;
+    font-size: 0.9rem;
+  }
+
+  .col-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .col-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #c8bfaf;
+    vertical-align: top;
+  }
+
+  .col-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+  .badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 2px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-req { background: rgba(200,75,47,0.25); color: #ff8c7a; border: 1px solid rgba(200,75,47,0.4); }
+  .badge-opt { background: rgba(45,106,79,0.25);  color: #74c69d; border: 1px solid rgba(45,106,79,0.4); }
+
+  .col-name { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--paper); }
+
+  /* ── FLOW ────────────────────────────────── */
+  .flow { background: var(--paper); }
+
+  .flow-diagram {
+    margin: 48px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .flow-node {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: center;
+    min-width: 120px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .flow-node:hover { border-color: var(--accent); transform: scale(1.04); }
+  .flow-node .fn   { font-size: 1.6rem; }
+
+  .flow-node h5 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+
+  .flow-node p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .flow-arrow { font-size: 1.4rem; color: var(--accent); padding: 0 6px; flex-shrink: 0; }
+
+  /* ── FOOTER ─────────────────────────────── */
+  footer {
+    background: var(--ink);
+    color: #6c7086;
+    text-align: center;
+    padding: 40px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+  }
+
+  footer strong { color: var(--paper); }
+
+  /* ── DETAIL PAGE ─────────────────────────── */
+  .detail-page {
+    min-height: 100vh;
+    background: var(--paper);
+  }
+
+  .detail-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 40px 28px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .detail-header::before {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,75,47,0.15) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    margin-bottom: 32px;
+    text-decoration: none;
+  }
+
+  .back-btn:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  .detail-header .file-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .detail-header .file-badge::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 40px;
+    background: var(--accent);
+  }
+
+  .detail-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    max-width: 700px;
+  }
+
+  .detail-header h1 span { color: var(--accent); font-style: italic; }
+
+  .detail-header .subtitle {
+    font-size: 1rem;
+    color: #c8bfaf;
+    margin-top: 16px;
+    max-width: 600px;
+    font-weight: 300;
+  }
+
+  /* ── DETAIL BODY ─────────────────────────── */
+  .detail-body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 28px;
+  }
+
+  .detail-section {
+    margin-bottom: 56px;
+  }
+
+  .detail-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .detail-section-title .step-badge {
+    background: var(--accent);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .step-detail-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    position: relative;
+    border-left: 4px solid var(--accent);
+  }
+
+  .step-detail-card .step-number {
+    position: absolute;
+    top: -14px;
+    left: 28px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 4px 12px;
+    border-radius: 3px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .step-detail-card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+
+  .step-detail-card p {
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  .step-detail-card .code-snippet {
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-top: 14px;
+    overflow-x: auto;
+    line-height: 1.8;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-snippet .kw  { color: #ff79c6; }
+  .code-snippet .fn  { color: #50fa7b; }
+  .code-snippet .st  { color: #f1fa8c; }
+  .code-snippet .cm  { color: #6272a4; }
+  .code-snippet .nm  { color: #bd93f9; }
+  .code-snippet .op  { color: #ff79c6; }
+
+  .why-box {
+    background: linear-gradient(135deg, rgba(200,75,47,0.06), rgba(200,75,47,0.02));
+    border: 1px solid rgba(200,75,47,0.2);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-top: 16px;
+  }
+
+  .why-box .why-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .why-box p {
+    font-size: 0.9rem;
+    color: var(--ink);
+    line-height: 1.7;
+  }
+
+  .lib-detail-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .lib-detail-icon {
+    width: 72px; height: 72px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    flex-shrink: 0;
+  }
+
+  .lib-detail-meta h2 {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 500;
+  }
+
+  .lib-detail-meta .lib-tagline {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .usage-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .usage-pill {
+    background: rgba(45,106,79,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(45,106,79,0.25);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .info-card .ic-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .info-card .ic-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .bottom-back {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .bottom-back p {
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ──────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollLine {
+    0%,100% { transform: scaleY(1); opacity: 1; }
+    50%      { transform: scaleY(0.6); opacity: 0.4; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ──────────────────────────── */
+  @media (max-width: 680px) {
+    .overview-grid  { grid-template-columns: 1fr; }
+    .flow-diagram   { flex-direction: column; }
+    .flow-arrow     { transform: rotate(90deg); }
+    .howto-step     { grid-template-columns: 40px 1fr; gap: 16px; }
+    .info-grid      { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAIN PAGE
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+<!-- ══ HERO ══════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-badge">Case Study Presentation</div>
+  <h1>Sales Data<br><span>Analysis &</span><br>Visualization</h1>
+  <p class="hero-sub">A modular Python pipeline that transforms raw sales data into interactive dashboards and actionable insights.</p>
+
+  <!-- ── TEAM CREDITS ── -->
+  <div class="team-band">
+    <div class="team-member">
+      <div class="team-avatar">AJ</div>
+      <div class="team-info">
+        <div class="name">Ajay</div>
+        <div class="role">Project Developer</div>
+      </div>
+    </div>
+    <div class="team-member">
+      <div class="team-avatar">SJ</div>
+      <div class="team-info">
+        <div class="name">Shanmukh Jagadeesh</div>
+        <div class="role">Project Developer</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-meta">
+    <div class="hero-meta-item"><span class="num">6</span><span class="label">Core Modules</span></div>
+    <div class="hero-meta-item"><span class="num">8</span><span class="label">Libraries Used</span></div>
+    <div class="hero-meta-item"><span class="num">5</span><span class="label">Pipeline Steps</span></div>
+    <div class="hero-meta-item"><span class="num">3</span><span class="label">File Formats</span></div>
+  </div>
+  <div class="scroll-hint">Scroll to explore</div>
+</section>
+
+<!-- ══ OVERVIEW ═══════════════════════════════════════════════════════ -->
+<section class="overview">
+  <div class="container">
+    <div class="section-label">Project Overview</div>
+    <h2 class="section-title">What is this project about?</h2>
+    <div class="overview-grid reveal">
+      <div class="overview-text">
+        <p>This is a <strong>Sales Data Analysis & Visualization System</strong> — a complete end-to-end Python application that can read sales data from any <strong>CSV, Excel (.xlsx), or JSON</strong> file.</p>
+        <p>Once the data is loaded, the system automatically <strong>cleans it</strong> (removes duplicates, fixes missing values), <strong>engineers new features</strong> (like month, year, profit margin), and runs a full <strong>Exploratory Data Analysis (EDA)</strong>.</p>
+        <p>Finally, it generates <strong>static PNG charts</strong> and launches a fully interactive <strong>Plotly Dash web dashboard</strong> — viewable in any browser at <strong>http://127.0.0.1:8050</strong>.</p>
+        <p style="margin-top:20px; font-size:0.85rem; color:#888;">Built by <strong style="color:var(--gold);">Ajay</strong> &amp; <strong style="color:var(--gold);">Shanmukh Jagadeesh</strong></p>
+      </div>
+      <div class="overview-features">
+        <div class="feature-chip"><div class="icon">📂</div><div class="text"><strong>Multi-format Support</strong>Reads CSV, Excel, and JSON files automatically</div></div>
+        <div class="feature-chip"><div class="icon">🧹</div><div class="text"><strong>Auto Data Cleaning</strong>Removes duplicates, fills or drops nulls intelligently</div></div>
+        <div class="feature-chip"><div class="icon">⚙️</div><div class="text"><strong>Feature Engineering</strong>Adds Month, Year, Profit Margin columns automatically</div></div>
+        <div class="feature-chip"><div class="icon">📊</div><div class="text"><strong>Static Charts</strong>Saves publication-quality PNG charts to the charts/ folder</div></div>
+        <div class="feature-chip"><div class="icon">🚀</div><div class="text"><strong>Interactive Dashboard</strong>Live filters, dropdowns, and charts via Plotly Dash</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROJECT STRUCTURE ═══════════════════════════════════════════════ -->
+<section class="structure">
+  <div class="container">
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title reveal">How the project files are organized</h2>
+    <div class="file-tree reveal">
+      <div class="content">
+<span class="ft-folder">📁 sales_analysis_project/</span><br>
+<span>├── </span><span class="ft-folder">📁 data/</span><br>
+<span>│   └── </span><span class="ft-data">sample_data.xlsx</span>   <span class="ft-note">← generated by generate_sample_data.py</span><br>
+<span>├── </span><span class="ft-folder">📁 charts/</span>              <span class="ft-note">← PNG charts saved here automatically</span><br>
+<span>├── </span><span class="ft-folder">📁 src/</span><br>
+<span>│   ├── </span><span class="ft-py">__init__.py</span><br>
+<span>│   ├── </span><span class="ft-py">loader.py</span>          <span class="ft-note">← Step 1 · Loads CSV / Excel / JSON</span><br>
+<span>│   ├── </span><span class="ft-py">cleaning.py</span>        <span class="ft-note">← Step 2 · Cleans & deduplicates data</span><br>
+<span>│   ├── </span><span class="ft-py">eda.py</span>             <span class="ft-note">← Step 3 · Feature engineering + EDA stats</span><br>
+<span>│   ├── </span><span class="ft-py">visualization.py</span>   <span class="ft-note">← Step 4 · Generates static PNG charts</span><br>
+<span>│   └── </span><span class="ft-py">dashboard.py</span>       <span class="ft-note">← Step 5 · Launches interactive web dashboard</span><br>
+<span>├── </span><span class="ft-py">main.py</span>                <span class="ft-note">← Entry point — runs the full pipeline</span><br>
+<span>├── </span><span class="ft-py">generate_sample_data.py</span><span class="ft-note">← Creates the demo Excel file</span><br>
+<span>├── </span><span class="ft-txt">requirements.txt</span>       <span class="ft-note">← All Python library dependencies</span><br>
+<span>└── </span><span class="ft-md">README.md</span>              <span class="ft-note">← Project documentation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PIPELINE ════════════════════════════════════════════════════════ -->
+<section class="pipeline">
+  <div class="container">
+    <div class="section-label">Pipeline Steps</div>
+    <h2 class="section-title reveal">How data flows through the system</h2>
+    <p style="margin-top:12px; font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.1em;">↓ Click any card to see how it works step by step</p>
+    <div class="steps-grid">
+
+      <div class="step-card reveal" data-num="1" onclick="showPage('page-step-loader')">
+        <div class="step-icon">📂</div>
+        <h3><span>src/loader.py</span>Step 1 — Load Data</h3>
+        <p>Detects the file extension automatically and reads the data using the right pandas method. Supports <code>.csv</code>, <code>.xlsx</code>, and <code>.json</code> formats. Returns a clean DataFrame ready for processing.</p>
+        <div class="tag-row"><span class="tag">pandas.read_excel</span><span class="tag">pandas.read_csv</span><span class="tag">pandas.read_json</span></div>
+        <div class="click-hint">▶ Click to explore step by step</div>
+      </div>
+
+      <div class="step-card reveal" data-num="2" onclick="showPage('page-step-cleaning')">
+        <div class="step-icon">🧹</div>
+        <h3><span>src/cleaning.py</span>Step 2 — Clean Data</h3>
+        <p>Removes exact duplicate rows, handles missing (NaN) values by filling numeric columns with median and dropping rows still missing essential data. Ensures the dataset is reliable before analysis.</p>
+        <div class="tag-row"><span class="tag">dropna</span><span class="tag">drop_duplicates</span><span class="tag">fillna</span></div>
+        <div class="click-hint">▶ Click to explore step by step</div>
+      </div>
+
+      <div class="step-card reveal" data-num="3" onclick="showPage('page-step-eda')">
+        <div class="step-icon">⚙️</div>
+        <h3><span>src/eda.py</span>Step 3 — Feature Engineering & EDA</h3>
+        <p>Creates new columns from existing data: <em>Order Month</em>, <em>Order Year</em>, and <em>Profit Margin %</em>. Then prints summary statistics, grouped aggregations by Category and Region, and correlation analysis.</p>
+        <div class="tag-row"><span class="tag">dt.month</span><span class="tag">groupby</span><span class="tag">describe</span><span class="tag">corr</span></div>
+        <div class="click-hint">▶ Click to explore step by step</div>
+      </div>
+
+      <div class="step-card reveal" data-num="4" onclick="showPage('page-step-viz')">
+        <div class="step-icon">📊</div>
+        <h3><span>src/visualization.py</span>Step 4 — Static Charts</h3>
+        <p>Uses Matplotlib and Seaborn to generate and save PNG charts including: Sales by Category (bar), Monthly Sales Trend (line), Profit vs Sales scatter, Regional breakdown, Segment pie chart, and Top 10 Customers.</p>
+        <div class="tag-row"><span class="tag">matplotlib</span><span class="tag">seaborn</span><span class="tag">savefig</span></div>
+        <div class="click-hint">▶ Click to explore step by step</div>
+      </div>
+
+      <div class="step-card reveal" data-num="5" onclick="showPage('page-step-dashboard')">
+        <div class="step-icon">🚀</div>
+        <h3><span>src/dashboard.py</span>Step 5 — Interactive Dashboard</h3>
+        <p>Launches a web application using Plotly Dash with Bootstrap styling. The dashboard includes dropdowns to filter by Region and Segment, and shows interactive versions of all charts. Opens at <strong>http://127.0.0.1:8050</strong>.</p>
+        <div class="tag-row"><span class="tag">Dash</span><span class="tag">plotly.express</span><span class="tag">dbc</span><span class="tag">callbacks</span></div>
+        <div class="click-hint">▶ Click to explore step by step</div>
+      </div>
+
+      <div class="step-card reveal" data-num="✦" onclick="showPage('page-step-sampledata')">
+        <div class="step-icon">🗂️</div>
+        <h3><span>generate_sample_data.py</span>Demo Data Generator</h3>
+        <p>Creates a realistic <code>sample_data.xlsx</code> file with 300 rows of synthetic sales records spanning 2022–2023. Intentionally injects 10 null values and 5 duplicate rows to demonstrate the cleaning step visibly.</p>
+        <div class="tag-row"><span class="tag">numpy</span><span class="tag">300 rows</span><span class="tag">5 duplicates</span><span class="tag">10 nulls</span></div>
+        <div class="click-hint">▶ Click to explore step by step</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ LIBRARIES ═══════════════════════════════════════════════════════ -->
+<section class="libraries">
+  <div class="container">
+    <div class="section-label">Technology Stack</div>
+    <h2 class="section-title reveal">Libraries used &amp; what they do</h2>
+    <p style="margin-top:12px; font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.1em;">↓ Click any library to see a full explanation</p>
+    <div class="libs-grid">
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-pandas')">
+        <div class="lib-icon" style="background:#e8f4fd;">🐼</div>
+        <div>
+          <h4>pandas</h4>
+          <p>The core data manipulation library. Used for loading files, cleaning rows, grouping, filtering, and all DataFrame operations throughout the pipeline.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-numpy')">
+        <div class="lib-icon" style="background:#fff3e0;">🔢</div>
+        <div>
+          <h4>numpy</h4>
+          <p>Provides fast numerical operations, random number generation (used in sample data), and mathematical functions used in feature engineering.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-matplotlib')">
+        <div class="lib-icon" style="background:#fce4ec;">📈</div>
+        <div>
+          <h4>matplotlib</h4>
+          <p>The foundational Python plotting library. Used to create and save static PNG charts like bar charts, line graphs, and scatter plots to the charts/ folder.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-seaborn')">
+        <div class="lib-icon" style="background:#f3e5f5;">🌊</div>
+        <div>
+          <h4>seaborn</h4>
+          <p>Built on top of matplotlib. Makes it easy to create beautiful statistical visualizations with minimal code — used for the correlation heatmap and styled charts.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-plotly')">
+        <div class="lib-icon" style="background:#e8f5e9;">✨</div>
+        <div>
+          <h4>plotly</h4>
+          <p>Creates interactive, browser-based charts with hover tooltips, zoom, and pan. Powers all the visuals inside the Dash web dashboard.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-dash')">
+        <div class="lib-icon" style="background:#e3f2fd;">🌐</div>
+        <div>
+          <h4>dash</h4>
+          <p>A Python web framework built on top of Plotly. Lets you build interactive data dashboards entirely in Python — no JavaScript needed.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-dbc')">
+        <div class="lib-icon" style="background:#fafafa;">🎨</div>
+        <div>
+          <h4>dash-bootstrap-components</h4>
+          <p>Provides Bootstrap CSS layout components (grids, cards, navbars) for the Dash app, making the dashboard look clean and responsive without writing custom CSS.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+      <div class="lib-card reveal" onclick="showPage('page-lib-openpyxl')">
+        <div class="lib-icon" style="background:#fff8e1;">📋</div>
+        <div>
+          <h4>openpyxl</h4>
+          <p>The engine that pandas uses internally to read and write <code>.xlsx</code> Excel files. Must be installed separately — it's listed in requirements.txt as a dependency.</p>
+          <div class="click-hint">▶ Learn how it's used</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW TO USE ═══════════════════════════════════════════════════════ -->
+<section class="howto">
+  <div class="container">
+    <div class="section-label">Usage Guide</div>
+    <h2 class="section-title reveal">How to run the project — step by step</h2>
+    <div class="steps-list">
+
+      <div class="howto-step reveal">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Create a Virtual Environment</h4>
+          <p>It's best practice to isolate this project's dependencies from your system Python using a virtual environment.</p>
+          <div class="code-block">
+<span class="comment"># Create the virtual environment</span><br>
+<span class="cmd">python -m venv venv</span><br><br>
+<span class="comment"># Activate it on Windows</span><br>
+<span class="cmd">venv\Scripts\activate</span><br><br>
+<span class="comment"># Activate it on Mac / Linux</span><br>
+<span class="cmd">source venv/bin/activate</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="howto-step reveal">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Install All Required Libraries</h4>
+          <p>All 8 libraries are listed in <code>requirements.txt</code>. Install them all at once with pip.</p>
+          <div class="code-block">
+<span class="cmd">pip install -r requirements.txt</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="howto-step reveal">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Generate the Sample Data (First Time Only)</h4>
+          <p>This creates <code>data/sample_data.xlsx</code> — a demo Excel file with 300 rows of realistic sales data. Skip this step if you have your own real data file.</p>
+          <div class="code-block">
+<span class="cmd">python generate_sample_data.py</span><br>
+<span class="comment"># Output: ✅ sample_data.xlsx created (305 rows)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="howto-step reveal">
+        <div class="step-num">4</div>
+        <div>
+          <h4>Run the Main Program</h4>
+          <p>You have three ways to run the analysis. Choose the one that fits your need:</p>
+          <div class="code-block">
+<span class="comment"># Option A — Interactive prompt (asks you for the file path)</span><br>
+<span class="cmd">python main.py</span><br><br>
+<span class="comment"># Option B — Pass the file path directly</span><br>
+<span class="cmd">python main.py data/sample_data.xlsx</span><br><br>
+<span class="comment"># Option C — Generate charts only, skip the browser dashboard</span><br>
+<span class="cmd">python main.py data/sample_data.xlsx --charts-only</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="howto-step reveal">
+        <div class="step-num">5</div>
+        <div>
+          <h4>Open the Interactive Dashboard</h4>
+          <p>After the script runs, the Dash server starts automatically. Open your browser and go to the address below to view your interactive sales dashboard.</p>
+          <div class="code-block">
+<span class="comment"># Open this URL in Chrome, Firefox, or Edge</span><br>
+<span class="cmd">http://127.0.0.1:8050</span><br><br>
+<span class="comment"># Press Ctrl+C in the terminal to stop the server</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ SUPPORTED COLUMNS ═══════════════════════════════════════════════ -->
+<section class="columns">
+  <div class="container">
+    <div class="section-label">Data Schema</div>
+    <h2 class="section-title reveal">Supported columns in the data file</h2>
+    <table class="col-table reveal">
+      <thead>
+        <tr>
+          <th>Column Name</th>
+          <th>Required?</th>
+          <th>What it enables</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="col-name">Sales</span></td><td><span class="badge badge-req">Required</span></td><td>The core metric — all revenue charts and totals depend on this</td></tr>
+        <tr><td><span class="col-name">Order Date</span></td><td><span class="badge badge-opt">Optional</span></td><td>Enables monthly/yearly trend lines and time-based features</td></tr>
+        <tr><td><span class="col-name">Profit</span></td><td><span class="badge badge-opt">Optional</span></td><td>Enables profit margin analysis and Profit vs Sales scatter chart</td></tr>
+        <tr><td><span class="col-name">Category</span></td><td><span class="badge badge-opt">Optional</span></td><td>Used for grouped bar charts (e.g., Technology, Furniture)</td></tr>
+        <tr><td><span class="col-name">Region</span></td><td><span class="badge badge-opt">Optional</span></td><td>Enables regional breakdown charts and dashboard filter dropdown</td></tr>
+        <tr><td><span class="col-name">Segment</span></td><td><span class="badge badge-opt">Optional</span></td><td>Powers the customer segment pie chart and dashboard filter</td></tr>
+        <tr><td><span class="col-name">Customer Name</span></td><td><span class="badge badge-opt">Optional</span></td><td>Enables the Top 10 Customers bar chart</td></tr>
+        <tr><td><span class="col-name">Quantity</span></td><td><span class="badge badge-opt">Optional</span></td><td>Loaded and available; can be used for volume analysis</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ FLOW DIAGRAM ════════════════════════════════════════════════════ -->
+<section class="flow">
+  <div class="container">
+    <div class="section-label">System Flow</div>
+    <h2 class="section-title reveal">The complete data pipeline at a glance</h2>
+    <div class="flow-diagram reveal">
+      <div class="flow-node"><div class="fn">📄</div><h5>Raw File</h5><p>CSV / XLSX / JSON</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="fn">📂</div><h5>loader.py</h5><p>Load Data</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="fn">🧹</div><h5>cleaning.py</h5><p>Clean Data</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="fn">⚙️</div><h5>eda.py</h5><p>Engineer + EDA</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="fn">📊</div><h5>visualization.py</h5><p>Static Charts</p></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="fn">🚀</div><h5>dashboard.py</h5><p>Live Dashboard</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+<footer>
+  <p><strong>Sales Data Analysis & Visualization System</strong></p>
+  <p style="margin-top:8px;">Case Study Presentation &nbsp;·&nbsp; Python &nbsp;·&nbsp; Pandas &nbsp;·&nbsp; Plotly Dash</p>
+  <p style="margin-top:12px; color:#888;">Made by <strong style="color:#d4a017;">Ajay</strong> &amp; <strong style="color:#d4a017;">Shanmukh Jagadeesh</strong></p>
+</footer>
+
+</div><!-- /page-home -->
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     STEP DETAIL PAGES
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- ── Step 1: loader.py ── -->
+<div id="page-step-loader" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">src/loader.py · Step 1 of 5</div>
+      <h1>📂 Load <span>Data</span></h1>
+      <p class="subtitle">How the system detects and reads your sales file — CSV, Excel, or JSON — into a pandas DataFrame ready for the next step.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+
+    <div class="detail-section">
+      <div class="detail-section-title">How loader.py Works <span class="step-badge">Step by Step</span></div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 1.1 — Receive the File Path</div>
+        <h4>The function accepts a file path string</h4>
+        <p>The main entry point calls <code>load_data(file_path)</code> and passes in the path to the user's data file. This could be typed manually or passed as a command-line argument. At this point, no file has been opened yet — we only have the path string.</p>
+        <div class="code-snippet">
+<span class="kw">def</span> <span class="fn">load_data</span>(file_path: <span class="nm">str</span>) -> pd.DataFrame:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># file_path example: "data/sample_data.xlsx"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;path = Path(file_path)
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why this design?</div>
+          <p>Accepting a string argument makes the function reusable — the same loader works whether the path comes from a terminal argument, a user prompt, or a test case.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 1.2 — Detect the File Extension</div>
+        <h4>Automatically choose the right reader</h4>
+        <p>Python's built-in <code>pathlib.Path</code> is used to extract the file extension (e.g., <code>.csv</code>, <code>.xlsx</code>, <code>.json</code>). The extension is lowercased to handle uppercase variants like <code>.CSV</code> or <code>.XLSX</code> without extra logic.</p>
+        <div class="code-snippet">
+ext = path.suffix.lower()  <span class="cm"># e.g. ".xlsx", ".csv", ".json"</span><br><br>
+<span class="kw">if</span> ext <span class="op">==</span> <span class="st">".csv"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;df = pd.<span class="fn">read_csv</span>(file_path)<br>
+<span class="kw">elif</span> ext <span class="op">in</span> (<span class="st">".xlsx"</span>, <span class="st">".xls"</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;df = pd.<span class="fn">read_excel</span>(file_path)<br>
+<span class="kw">elif</span> ext <span class="op">==</span> <span class="st">".json"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;df = pd.<span class="fn">read_json</span>(file_path)
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why not just always use read_csv?</div>
+          <p>Each file format has different internal structure. CSV is plain text with commas; XLSX is a compressed XML binary; JSON is nested key-value pairs. Pandas provides a dedicated reader for each that understands the format correctly.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 1.3 — Handle Unknown Formats</div>
+        <h4>Raise a clear error for unsupported files</h4>
+        <p>If the extension doesn't match any supported format, the function raises a <code>ValueError</code> with a helpful message. This prevents silent failures where the program might try to process garbage data without knowing why.</p>
+        <div class="code-snippet">
+<span class="kw">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">raise</span> <span class="nm">ValueError</span>(<span class="st">f"Unsupported file type: {ext}"</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 1.4 — Return the DataFrame</div>
+        <h4>Pass a clean DataFrame to the next step</h4>
+        <p>After loading, the function prints a brief confirmation showing how many rows and columns were loaded. Then it returns the DataFrame object, which is immediately passed to <code>cleaning.py</code> in the next pipeline step.</p>
+        <div class="code-snippet">
+<span class="fn">print</span>(<span class="st">f"✅ Loaded {len(df)} rows × {len(df.columns)} columns"</span>)<br>
+<span class="kw">return</span> df
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Step 2: cleaning.py ── -->
+<div id="page-step-cleaning" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">src/cleaning.py · Step 2 of 5</div>
+      <h1>🧹 Clean <span>Data</span></h1>
+      <p class="subtitle">How the system removes dirty data — duplicates, nulls, and type mismatches — so every downstream step works on reliable, consistent data.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+
+    <div class="detail-section">
+      <div class="detail-section-title">How cleaning.py Works <span class="step-badge">Step by Step</span></div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 2.1 — Remove Duplicate Rows</div>
+        <h4>Drop exact row duplicates</h4>
+        <p>The first cleaning operation calls <code>drop_duplicates()</code> which scans every row and removes any that are completely identical to a previous row. The sample data intentionally has 5 injected duplicates — this step removes all of them.</p>
+        <div class="code-snippet">
+before = <span class="fn">len</span>(df)<br>
+df = df.<span class="fn">drop_duplicates</span>()<br>
+<span class="fn">print</span>(<span class="st">f"Removed {before - len(df)} duplicate rows"</span>)
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why this matters</div>
+          <p>Duplicate rows skew aggregations — a sale counted twice doubles its contribution to totals and averages. Removing duplicates ensures accurate revenue figures.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 2.2 — Fill Numeric Missing Values</div>
+        <h4>Replace NaN in numeric columns with the median</h4>
+        <p>For each numeric column (like Sales, Profit, Quantity), missing values are filled with the column's median. The median is preferred over mean because it isn't distorted by outlier values — a single huge order won't inflate the fill value.</p>
+        <div class="code-snippet">
+<span class="kw">for</span> col <span class="kw">in</span> df.<span class="fn">select_dtypes</span>(include=<span class="st">'number'</span>).columns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;df[col].<span class="fn">fillna</span>(df[col].<span class="fn">median</span>(), inplace=<span class="nm">True</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 2.3 — Drop Remaining Null Rows</div>
+        <h4>Remove rows where essential data is still missing</h4>
+        <p>After filling numerics, any rows that still have null values in critical text columns (like Category or Region) are dropped entirely. These rows cannot contribute to analysis without category labels.</p>
+        <div class="code-snippet">
+df = df.<span class="fn">dropna</span>(subset=[<span class="st">'Sales'</span>])<br>
+<span class="cm"># Sales column is essential — drop rows without it</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 2.4 — Reset the DataFrame Index</div>
+        <h4>Reindex so row numbers are continuous again</h4>
+        <p>After dropping rows, the index has gaps (e.g., 0, 1, 4, 7...). Resetting ensures a clean 0-to-N index, preventing potential off-by-one errors in later processing.</p>
+        <div class="code-snippet">
+df = df.<span class="fn">reset_index</span>(drop=<span class="nm">True</span>)<br>
+<span class="fn">print</span>(<span class="st">f"✅ Cleaned DataFrame: {len(df)} rows remain"</span>)<br>
+<span class="kw">return</span> df
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Step 3: eda.py ── -->
+<div id="page-step-eda" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">src/eda.py · Step 3 of 5</div>
+      <h1>⚙️ Feature Engineering <span>& EDA</span></h1>
+      <p class="subtitle">How the system creates new analytical columns from raw data and then extracts statistical insights through Exploratory Data Analysis.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+
+    <div class="detail-section">
+      <div class="detail-section-title">How eda.py Works <span class="step-badge">Step by Step</span></div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 3.1 — Parse Dates</div>
+        <h4>Convert Order Date column to datetime type</h4>
+        <p>The <code>Order Date</code> column arrives as plain text (e.g., "2023-04-15"). pandas' <code>to_datetime()</code> converts it into a real datetime object, unlocking time-based operations like extracting month and year.</p>
+        <div class="code-snippet">
+df[<span class="st">'Order Date'</span>] = pd.<span class="fn">to_datetime</span>(df[<span class="st">'Order Date'</span>], errors=<span class="st">'coerce'</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 3.2 — Extract Month & Year</div>
+        <h4>Create new time-based feature columns</h4>
+        <p>Once dates are parsed, two new columns are created: <code>Order Month</code> (1–12) and <code>Order Year</code> (2022, 2023, etc). These power the monthly trend charts and allow year-over-year comparison.</p>
+        <div class="code-snippet">
+df[<span class="st">'Order Month'</span>] = df[<span class="st">'Order Date'</span>].dt.month<br>
+df[<span class="st">'Order Year'</span>]  = df[<span class="st">'Order Date'</span>].dt.year
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why extract these?</div>
+          <p>Raw dates can't be grouped directly into "monthly totals". Extracting the month as a number lets <code>groupby('Order Month')</code> work instantly to produce a monthly sales series for trend charts.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 3.3 — Compute Profit Margin</div>
+        <h4>Add a derived percentage column</h4>
+        <p>A new column <code>Profit Margin %</code> is calculated by dividing Profit by Sales and multiplying by 100. This derived metric is more useful for comparison than raw profit values — it shows efficiency regardless of order size.</p>
+        <div class="code-snippet">
+df[<span class="st">'Profit Margin %'</span>] = (df[<span class="st">'Profit'</span>] / df[<span class="st">'Sales'</span>]) * <span class="nm">100</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 3.4 — Summary Statistics</div>
+        <h4>Print describe() output to terminal</h4>
+        <p>The <code>describe()</code> method generates count, mean, std, min, 25th percentile, median, 75th percentile, and max for every numeric column. This is printed to the terminal as a quick sanity check of the data's range and distribution.</p>
+        <div class="code-snippet">
+<span class="fn">print</span>(df.<span class="fn">describe</span>().to_string())
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 3.5 — Group Aggregations</div>
+        <h4>Sales totals by Category and Region</h4>
+        <p>Two grouped summaries are computed and printed: total and average sales grouped by <code>Category</code>, and by <code>Region</code>. These inform which segments are most profitable and guide which charts to highlight in the dashboard.</p>
+        <div class="code-snippet">
+category_sales = df.<span class="fn">groupby</span>(<span class="st">'Category'</span>)[<span class="st">'Sales'</span>].<span class="fn">agg</span>([<span class="st">'sum'</span>, <span class="st">'mean'</span>])<br>
+region_sales   = df.<span class="fn">groupby</span>(<span class="st">'Region'</span>)[<span class="st">'Sales'</span>].<span class="fn">agg</span>([<span class="st">'sum'</span>, <span class="st">'mean'</span>])
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 3.6 — Correlation Matrix</div>
+        <h4>Find relationships between numeric columns</h4>
+        <p>The <code>corr()</code> method computes the Pearson correlation coefficient between every pair of numeric columns. A value near +1 means strong positive relationship (higher sales → higher profit). This feeds the heatmap chart in visualization.py.</p>
+        <div class="code-snippet">
+corr_matrix = df.<span class="fn">select_dtypes</span>(include=<span class="st">'number'</span>).<span class="fn">corr</span>()<br>
+<span class="fn">print</span>(corr_matrix)
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Step 4: visualization.py ── -->
+<div id="page-step-viz" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">src/visualization.py · Step 4 of 5</div>
+      <h1>📊 Static <span>Charts</span></h1>
+      <p class="subtitle">How matplotlib and seaborn are used to generate 6 publication-quality PNG charts saved to the charts/ folder.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+
+    <div class="detail-section">
+      <div class="detail-section-title">How visualization.py Works <span class="step-badge">Step by Step</span></div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 4.1 — Setup Plot Style</div>
+        <h4>Apply consistent theme across all charts</h4>
+        <p>Before drawing any chart, a global Seaborn theme is applied using <code>sns.set_theme()</code>. This sets a consistent background grid, font sizes, and color palette for all subsequent plots so they look cohesive as a set.</p>
+        <div class="code-snippet">
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt<br>
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns<br><br>
+sns.<span class="fn">set_theme</span>(style=<span class="st">"whitegrid"</span>, palette=<span class="st">"muted"</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 4.2 — Chart 1: Sales by Category (Bar)</div>
+        <h4>Compare total revenue across product categories</h4>
+        <p>Groups the DataFrame by <code>Category</code>, sums the <code>Sales</code> column, and plots a vertical bar chart. Each bar represents one category (e.g., Technology, Furniture, Office Supplies). Saved as <code>charts/sales_by_category.png</code>.</p>
+        <div class="code-snippet">
+cat_sales = df.<span class="fn">groupby</span>(<span class="st">'Category'</span>)[<span class="st">'Sales'</span>].<span class="fn">sum</span>()<br>
+cat_sales.<span class="fn">plot</span>(kind=<span class="st">'bar'</span>, color=<span class="st">'steelblue'</span>)<br>
+plt.<span class="fn">savefig</span>(<span class="st">'charts/sales_by_category.png'</span>, dpi=<span class="nm">150</span>, bbox_inches=<span class="st">'tight'</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 4.3 — Chart 2: Monthly Sales Trend (Line)</div>
+        <h4>Visualize how sales change over time</h4>
+        <p>Groups by <code>Order Month</code> and plots a line chart. The X axis shows months 1–12, and the Y axis shows total sales per month. This reveals seasonal patterns — e.g., a November spike for holiday shopping.</p>
+        <div class="code-snippet">
+monthly = df.<span class="fn">groupby</span>(<span class="st">'Order Month'</span>)[<span class="st">'Sales'</span>].<span class="fn">sum</span>()<br>
+monthly.<span class="fn">plot</span>(kind=<span class="st">'line'</span>, marker=<span class="st">'o'</span>)<br>
+plt.<span class="fn">savefig</span>(<span class="st">'charts/monthly_trend.png'</span>, dpi=<span class="nm">150</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 4.4 — Chart 3: Profit vs Sales Scatter</div>
+        <h4>Find the relationship between revenue and profit</h4>
+        <p>Each dot represents one order. The X position is its Sales value, the Y position is its Profit. A positive correlation (dots trending up-right) confirms that higher-sales orders also tend to generate more profit.</p>
+        <div class="code-snippet">
+plt.<span class="fn">scatter</span>(df[<span class="st">'Sales'</span>], df[<span class="st">'Profit'</span>], alpha=<span class="nm">0.4</span>)<br>
+plt.<span class="fn">savefig</span>(<span class="st">'charts/profit_vs_sales.png'</span>, dpi=<span class="nm">150</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 4.5 — Chart 4: Correlation Heatmap (Seaborn)</div>
+        <h4>Visualize all numeric relationships at once</h4>
+        <p>Takes the correlation matrix computed in eda.py and renders it as a color-coded grid using <code>sns.heatmap()</code>. Warm colors = positive correlation, cool colors = negative. Annotations show exact coefficient values.</p>
+        <div class="code-snippet">
+sns.<span class="fn">heatmap</span>(corr_matrix, annot=<span class="nm">True</span>, fmt=<span class="st">".2f"</span>, cmap=<span class="st">"coolwarm"</span>)<br>
+plt.<span class="fn">savefig</span>(<span class="st">'charts/correlation_heatmap.png'</span>, dpi=<span class="nm">150</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 4.6 — Charts 5 & 6: Region & Segment</div>
+        <h4>Regional bar chart + Customer segment pie chart</h4>
+        <p>Two final charts: a horizontal bar chart of sales by Region, and a pie chart showing customer Segment split (Consumer, Corporate, Home Office). All charts are saved as separate PNG files in the <code>charts/</code> folder.</p>
+        <div class="code-snippet">
+<span class="cm"># Regional bar</span><br>
+df.<span class="fn">groupby</span>(<span class="st">'Region'</span>)[<span class="st">'Sales'</span>].<span class="fn">sum</span>().<span class="fn">plot</span>(kind=<span class="st">'barh'</span>)<br>
+plt.<span class="fn">savefig</span>(<span class="st">'charts/region_sales.png'</span>)<br><br>
+<span class="cm"># Segment pie</span><br>
+df[<span class="st">'Segment'</span>].<span class="fn">value_counts</span>().<span class="fn">plot</span>(kind=<span class="st">'pie'</span>, autopct=<span class="st">'%1.1f%%'</span>)<br>
+plt.<span class="fn">savefig</span>(<span class="st">'charts/segment_pie.png'</span>)
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Step 5: dashboard.py ── -->
+<div id="page-step-dashboard" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">src/dashboard.py · Step 5 of 5</div>
+      <h1>🚀 Interactive <span>Dashboard</span></h1>
+      <p class="subtitle">How Plotly Dash assembles an interactive web application with live filter controls, fully in Python — no HTML or JavaScript required.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+
+    <div class="detail-section">
+      <div class="detail-section-title">How dashboard.py Works <span class="step-badge">Step by Step</span></div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 5.1 — Initialize the Dash App</div>
+        <h4>Create the application object with Bootstrap theme</h4>
+        <p>A <code>Dash</code> app object is created and given the <code>BOOTSTRAP</code> external stylesheet from dash-bootstrap-components. This one line loads the full Bootstrap CSS framework into the web app, enabling responsive grid layouts.</p>
+        <div class="code-snippet">
+<span class="kw">import</span> dash<br>
+<span class="kw">import</span> dash_bootstrap_components <span class="kw">as</span> dbc<br><br>
+app = dash.<span class="fn">Dash</span>(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 5.2 — Build the Layout</div>
+        <h4>Define the page structure using Python components</h4>
+        <p>The dashboard layout is described as nested Python objects — <code>dbc.Container</code>, <code>dbc.Row</code>, <code>dbc.Col</code> act exactly like Bootstrap's grid system. Each chart area is wrapped in a <code>dcc.Graph</code> component which renders Plotly charts.</p>
+        <div class="code-snippet">
+app.layout = dbc.<span class="fn">Container</span>([<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">Row</span>([dbc.<span class="fn">Col</span>(html.<span class="fn">H1</span>(<span class="st">"Sales Dashboard"</span>))]),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">Row</span>([<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">Col</span>(dcc.<span class="fn">Dropdown</span>(id=<span class="st">'region-filter'</span>, ...), md=<span class="nm">4</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">Col</span>(dcc.<span class="fn">Graph</span>(id=<span class="st">'sales-chart'</span>), md=<span class="nm">8</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;])<br>
+])
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 5.3 — Add Filter Dropdowns</div>
+        <h4>Region and Segment filter controls</h4>
+        <p>Two <code>dcc.Dropdown</code> components are added — one listing all unique Regions, one listing all Segments. When the user picks a value from either dropdown, Dash automatically triggers the callback function to redraw the charts with filtered data.</p>
+        <div class="code-snippet">
+dcc.<span class="fn">Dropdown</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;id=<span class="st">'region-filter'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;options=[{<span class="st">'label'</span>: r, <span class="st">'value'</span>: r} <span class="kw">for</span> r <span class="kw">in</span> df[<span class="st">'Region'</span>].<span class="fn">unique</span>()],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;placeholder=<span class="st">'Filter by Region...'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;multi=<span class="nm">True</span><br>
+)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 5.4 — Write the Callback</div>
+        <h4>Reactive function that redraws charts on filter change</h4>
+        <p>The <code>@app.callback</code> decorator links dropdown values to chart outputs. Every time a filter changes, Dash calls the decorated function automatically with the new filter values. The function filters the DataFrame and returns updated Plotly figure objects.</p>
+        <div class="code-snippet">
+@app.<span class="fn">callback</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Output(<span class="st">'sales-chart'</span>, <span class="st">'figure'</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Input(<span class="st">'region-filter'</span>, <span class="st">'value'</span>)<br>
+)<br>
+<span class="kw">def</span> <span class="fn">update_chart</span>(selected_regions):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filtered = df[df[<span class="st">'Region'</span>].<span class="fn">isin</span>(selected_regions)] <span class="kw">if</span> selected_regions <span class="kw">else</span> df<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> px.<span class="fn">bar</span>(filtered, x=<span class="st">'Category'</span>, y=<span class="st">'Sales'</span>)
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why use callbacks?</div>
+          <p>Callbacks are what make Dash "reactive" — the page updates instantly without any page reload. It's like a spreadsheet formula: change an input, the output auto-recalculates. This is the core feature that makes Dash powerful for data dashboards.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step 5.5 — Start the Server</div>
+        <h4>Launch the local web server</h4>
+        <p>The final line starts a Flask development server on port 8050. The terminal prints the local URL. Anyone on the same machine can open a browser and interact with the live dashboard. Press <code>Ctrl+C</code> to stop it.</p>
+        <div class="code-snippet">
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="st">'__main__'</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;app.<span class="fn">run_server</span>(debug=<span class="nm">True</span>, port=<span class="nm">8050</span>)<br><br>
+<span class="cm"># Terminal output:</span><br>
+<span class="cm"># Dash is running on http://127.0.0.1:8050/</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── generate_sample_data.py ── -->
+<div id="page-step-sampledata" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">generate_sample_data.py · Demo Generator</div>
+      <h1>🗂️ Demo Data <span>Generator</span></h1>
+      <p class="subtitle">How the script builds a realistic 300-row sales dataset from scratch using numpy, and deliberately injects errors to showcase the cleaning step.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+
+    <div class="detail-section">
+      <div class="detail-section-title">How generate_sample_data.py Works <span class="step-badge">Step by Step</span></div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step G.1 — Define the Data Schema</div>
+        <h4>Decide what columns the fake data will have</h4>
+        <p>The script first defines lists of possible values for each categorical column — Regions, Categories, Segments, and a pool of 50 customer names. These pools are randomly sampled to create variety across the 300 generated rows.</p>
+        <div class="code-snippet">
+regions    = [<span class="st">'East'</span>, <span class="st">'West'</span>, <span class="st">'North'</span>, <span class="st">'South'</span>]<br>
+categories = [<span class="st">'Technology'</span>, <span class="st">'Furniture'</span>, <span class="st">'Office Supplies'</span>]<br>
+segments   = [<span class="st">'Consumer'</span>, <span class="st">'Corporate'</span>, <span class="st">'Home Office'</span>]
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step G.2 — Generate 300 Random Rows</div>
+        <h4>Use numpy to create realistic numeric distributions</h4>
+        <p>numpy's <code>np.random</code> functions generate realistic-looking numbers: Sales values follow a log-normal distribution (skewed toward smaller orders with occasional large ones), Quantities are integers 1–10, and Profit is derived from Sales with a random margin.</p>
+        <div class="code-snippet">
+n = <span class="nm">300</span><br>
+sales    = np.random.<span class="fn">lognormal</span>(mean=<span class="nm">5</span>, sigma=<span class="nm">1</span>, size=n).<span class="fn">round</span>(<span class="nm">2</span>)<br>
+quantity = np.random.<span class="fn">randint</span>(<span class="nm">1</span>, <span class="nm">10</span>, size=n)<br>
+profit   = (sales * np.random.<span class="fn">uniform</span>(<span class="nm">0.05</span>, <span class="nm">0.35</span>, size=n)).<span class="fn">round</span>(<span class="nm">2</span>)
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why log-normal for sales?</div>
+          <p>Real sales data is rarely normally distributed — most orders are small, with occasional very large ones. A log-normal distribution mirrors this real-world pattern, making the demo data more representative.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step G.3 — Inject 10 Null Values</div>
+        <h4>Deliberately break some cells to demo cleaning</h4>
+        <p>10 random cell positions in the Sales and Profit columns are set to <code>np.nan</code>. This ensures that when the user runs cleaning.py, they'll see the "filled 10 null values" message — proving the cleaning step actually works.</p>
+        <div class="code-snippet">
+null_indices = np.random.<span class="fn">choice</span>(n, <span class="nm">10</span>, replace=<span class="nm">False</span>)<br>
+df.loc[null_indices, <span class="st">'Sales'</span>] = np.nan
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step G.4 — Inject 5 Duplicate Rows</div>
+        <h4>Add exact copies to prove deduplication works</h4>
+        <p>5 rows from the DataFrame are randomly selected and appended as exact duplicates. This makes the DataFrame temporarily 305 rows. After cleaning.py runs <code>drop_duplicates()</code>, it will return to 300 rows — visibly demonstrating the function's effect.</p>
+        <div class="code-snippet">
+dupes = df.<span class="fn">sample</span>(<span class="nm">5</span>, random_state=<span class="nm">42</span>)<br>
+df = pd.<span class="fn">concat</span>([df, dupes], ignore_index=<span class="nm">True</span>)<br>
+<span class="cm"># Now 305 rows (300 original + 5 duplicates)</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Step G.5 — Save to Excel</div>
+        <h4>Write the DataFrame to data/sample_data.xlsx</h4>
+        <p>The final DataFrame (with intentional flaws) is saved as an Excel file using pandas' <code>to_excel()</code> method, which internally uses the openpyxl library. The <code>index=False</code> parameter prevents pandas from writing a useless row-number column.</p>
+        <div class="code-snippet">
+df.<span class="fn">to_excel</span>(<span class="st">'data/sample_data.xlsx'</span>, index=<span class="nm">False</span>)<br>
+<span class="fn">print</span>(<span class="st">"✅ sample_data.xlsx created"</span>, <span class="fn">len</span>(df), <span class="st">"rows"</span>)
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     LIBRARY DETAIL PAGES
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- ── pandas ── -->
+<div id="page-lib-pandas" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>🐼 <span>pandas</span></h1>
+      <p class="subtitle">The backbone of the entire pipeline — every operation that touches, transforms, or analyzes data goes through pandas.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#e8f4fd;">🐼</div>
+      <div class="lib-detail-meta">
+        <h2>pandas</h2>
+        <p class="lib-tagline">Python Data Analysis Library — the industry standard for tabular data.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Data Loading</span><span class="usage-pill">Cleaning</span><span class="usage-pill">Grouping</span><span class="usage-pill">Filtering</span><span class="usage-pill">Feature Engineering</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install pandas</div></div>
+      <div class="info-card"><div class="ic-label">Used In Files</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">loader · cleaning · eda · visualization · dashboard</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How pandas is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — Reading Files (loader.py)</div>
+        <h4>pd.read_csv, pd.read_excel, pd.read_json</h4>
+        <p>These three functions are the entry point to every data pipeline. They parse raw file bytes into a structured <strong>DataFrame</strong> — pandas' core data structure. A DataFrame is like a spreadsheet table in memory: rows are records, columns are fields, and you can query them with code.</p>
+        <div class="code-snippet">
+df = pd.<span class="fn">read_excel</span>(<span class="st">'data/sample_data.xlsx'</span>)<br>
+<span class="cm"># df is now a 300×9 table of rows and columns</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Cleaning Data (cleaning.py)</div>
+        <h4>drop_duplicates, fillna, dropna, reset_index</h4>
+        <p>pandas provides all the tools needed to fix bad data in just a few method calls. <code>drop_duplicates()</code> compares all rows and removes copies. <code>fillna(df[col].median())</code> replaces NaN with the column median. <code>dropna()</code> removes rows that remain incomplete after filling.</p>
+        <div class="code-snippet">
+df = df.<span class="fn">drop_duplicates</span>()<br>
+df[col].<span class="fn">fillna</span>(df[col].<span class="fn">median</span>(), inplace=<span class="nm">True</span>)<br>
+df = df.<span class="fn">dropna</span>(subset=[<span class="st">'Sales'</span>])
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — Feature Engineering (eda.py)</div>
+        <h4>to_datetime, dt.month, dt.year, column creation</h4>
+        <p>pandas makes it trivial to derive new columns from existing ones. <code>pd.to_datetime()</code> converts strings to real dates. The <code>.dt</code> accessor then gives access to date parts like <code>.dt.month</code>. New columns are created by simple assignment, like adding a spreadsheet formula column.</p>
+        <div class="code-snippet">
+df[<span class="st">'Order Date'</span>]  = pd.<span class="fn">to_datetime</span>(df[<span class="st">'Order Date'</span>])<br>
+df[<span class="st">'Order Month'</span>] = df[<span class="st">'Order Date'</span>].dt.month<br>
+df[<span class="st">'Profit Margin %'</span>] = (df[<span class="st">'Profit'</span>] / df[<span class="st">'Sales'</span>]) * <span class="nm">100</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 4 — Aggregations (eda.py + visualization.py)</div>
+        <h4>groupby, agg, value_counts, describe</h4>
+        <p><code>groupby()</code> is one of pandas' most powerful features — it splits data into groups by a column value, then applies a function to each group. <code>.agg(['sum','mean'])</code> computes multiple statistics at once. <code>describe()</code> produces a full statistical summary in one call.</p>
+        <div class="code-snippet">
+cat_sales = df.<span class="fn">groupby</span>(<span class="st">'Category'</span>)[<span class="st">'Sales'</span>].<span class="fn">agg</span>([<span class="st">'sum'</span>,<span class="st">'mean'</span>])<br>
+df.<span class="fn">describe</span>()  <span class="cm"># count, mean, std, min, 25%, 50%, 75%, max</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── numpy ── -->
+<div id="page-lib-numpy" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>🔢 <span>numpy</span></h1>
+      <p class="subtitle">The mathematical engine beneath pandas and the tool used to generate realistic synthetic sales data for the demo dataset.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#fff3e0;">🔢</div>
+      <div class="lib-detail-meta">
+        <h2>numpy</h2>
+        <p class="lib-tagline">Numerical Python — fast array operations and math functions.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Random Data</span><span class="usage-pill">NaN Values</span><span class="usage-pill">Math Operations</span><span class="usage-pill">Array Creation</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install numpy</div></div>
+      <div class="info-card"><div class="ic-label">Used In Files</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">generate_sample_data · eda</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How numpy is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — Generate Random Sales Values</div>
+        <h4>np.random.lognormal for realistic sales distribution</h4>
+        <p>Real sales data doesn't follow a bell curve — most transactions are small with occasional large ones. <code>np.random.lognormal()</code> produces exactly this skewed distribution. It generates 300 positive float values that look like authentic sales figures ranging from ~$20 to ~$10,000.</p>
+        <div class="code-snippet">
+sales = np.random.<span class="fn">lognormal</span>(mean=<span class="nm">5</span>, sigma=<span class="nm">1</span>, size=<span class="nm">300</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Inject Missing Values (NaN)</div>
+        <h4>np.nan as the standard "missing data" sentinel</h4>
+        <p><code>np.nan</code> is the universally accepted representation of a missing number in Python's data ecosystem. pandas understands <code>np.nan</code> natively — all cleaning functions like <code>fillna()</code> and <code>dropna()</code> target exactly this value.</p>
+        <div class="code-snippet">
+df.loc[null_indices, <span class="st">'Sales'</span>] = np.nan<br>
+<span class="cm"># pandas reads np.nan as "missing" — cleaned by fillna()</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — Random Index Selection</div>
+        <h4>np.random.choice to pick random positions</h4>
+        <p><code>np.random.choice(n, 10, replace=False)</code> selects 10 unique random row numbers from the range 0–299 without repeats. These become the positions where null values are injected, ensuring the nulls are scattered randomly through the dataset.</p>
+        <div class="code-snippet">
+null_indices = np.random.<span class="fn">choice</span>(<span class="nm">300</span>, <span class="nm">10</span>, replace=<span class="nm">False</span>)<br>
+<span class="cm"># Returns e.g. [42, 7, 189, 253, ...]</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 4 — Why numpy Matters Under the Hood</div>
+        <h4>pandas is built on top of numpy arrays</h4>
+        <p>Every pandas DataFrame column is secretly a numpy array. When pandas computes <code>df['Sales'].median()</code>, it delegates that math to numpy's optimized C code. This is why pandas is so fast — it uses numpy's compiled numerical routines rather than slower Python loops.</p>
+        <div class="why-box">
+          <div class="why-label">Performance context</div>
+          <p>numpy can compute the mean of 1 million numbers roughly 100× faster than a plain Python for loop, because it executes the calculation in compiled C/Fortran code rather than interpreted Python bytecode.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── matplotlib ── -->
+<div id="page-lib-matplotlib" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>📈 <span>matplotlib</span></h1>
+      <p class="subtitle">The original Python plotting library — used to draw, style, and export all static PNG charts to the charts/ folder.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#fce4ec;">📈</div>
+      <div class="lib-detail-meta">
+        <h2>matplotlib</h2>
+        <p class="lib-tagline">Comprehensive 2D plotting library. The foundation of Python data visualization.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Bar Charts</span><span class="usage-pill">Line Charts</span><span class="usage-pill">Scatter Plots</span><span class="usage-pill">Pie Charts</span><span class="usage-pill">PNG Export</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install matplotlib</div></div>
+      <div class="info-card"><div class="ic-label">Used In Files</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">visualization.py</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How matplotlib is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — Figure & Axes Architecture</div>
+        <h4>Every chart starts with plt.figure() and plt.subplots()</h4>
+        <p>matplotlib uses a two-level structure: a <strong>Figure</strong> is the entire canvas, and <strong>Axes</strong> is the actual plot area within it. Creating a figure first gives you control over its pixel dimensions and resolution before drawing anything on it.</p>
+        <div class="code-snippet">
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nm">10</span>, <span class="nm">6</span>))<br>
+<span class="cm"># 10 inches wide, 6 inches tall canvas</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Drawing Chart Types</div>
+        <h4>bar, plot (line), scatter, pie</h4>
+        <p>matplotlib has dedicated methods for every common chart type. The project uses <code>bar()</code> for category comparisons, <code>plot(kind='line')</code> for time trends, <code>scatter()</code} for correlation views, and <code>pie()</code> for segment proportions. Each is one function call.</p>
+        <div class="code-snippet">
+ax.<span class="fn">bar</span>(categories, values, color=<span class="st">'steelblue'</span>)<br>
+ax.<span class="fn">plot</span>(months, sales, marker=<span class="st">'o'</span>, linewidth=<span class="nm">2</span>)<br>
+ax.<span class="fn">scatter</span>(df[<span class="st">'Sales'</span>], df[<span class="st">'Profit'</span>], alpha=<span class="nm">0.4</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — Adding Labels & Titles</div>
+        <h4>Annotating charts for readability</h4>
+        <p>Every chart gets a title, X-axis label, and Y-axis label to make it self-explanatory. <code>plt.tight_layout()</code> is called before saving to prevent labels from being clipped at the edges of the image.</p>
+        <div class="code-snippet">
+plt.<span class="fn">title</span>(<span class="st">'Sales by Category'</span>, fontsize=<span class="nm">14</span>)<br>
+plt.<span class="fn">xlabel</span>(<span class="st">'Product Category'</span>)<br>
+plt.<span class="fn">ylabel</span>(<span class="st">'Total Sales ($)'</span>)<br>
+plt.<span class="fn">tight_layout</span>()
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 4 — Saving to PNG Files</div>
+        <h4>plt.savefig writes publication-quality images</h4>
+        <p><code>plt.savefig()</code> writes the chart to disk as a PNG file. The <code>dpi=150</code> parameter sets 150 dots-per-inch resolution — sharp enough for presentations and reports. <code>bbox_inches='tight'</code> ensures nothing is cut off. After saving, <code>plt.close()</code> frees memory.</p>
+        <div class="code-snippet">
+plt.<span class="fn">savefig</span>(<span class="st">'charts/sales_by_category.png'</span>, dpi=<span class="nm">150</span>, bbox_inches=<span class="st">'tight'</span>)<br>
+plt.<span class="fn">close</span>()  <span class="cm"># free memory before the next chart</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── seaborn ── -->
+<div id="page-lib-seaborn" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>🌊 <span>seaborn</span></h1>
+      <p class="subtitle">A high-level statistical visualization layer on top of matplotlib — used for the beautiful correlation heatmap and styled chart themes.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#f3e5f5;">🌊</div>
+      <div class="lib-detail-meta">
+        <h2>seaborn</h2>
+        <p class="lib-tagline">Statistical data visualization built on matplotlib. Beautiful charts with minimal code.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Heatmaps</span><span class="usage-pill">Statistical Charts</span><span class="usage-pill">Theme Setting</span><span class="usage-pill">Color Palettes</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install seaborn</div></div>
+      <div class="info-card"><div class="ic-label">Used In Files</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">visualization.py</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How seaborn is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — Global Theme (set_theme)</div>
+        <h4>Apply consistent styling to ALL matplotlib charts</h4>
+        <p>Calling <code>sns.set_theme()</code> once at the start of visualization.py changes the default style for every subsequent matplotlib chart — even ones drawn with plain matplotlib code. It sets background grids, font families, tick marks, and default color palettes globally.</p>
+        <div class="code-snippet">
+sns.<span class="fn">set_theme</span>(style=<span class="st">"whitegrid"</span>, palette=<span class="st">"muted"</span>, font_scale=<span class="nm">1.1</span>)<br>
+<span class="cm"># Now ALL charts have consistent professional styling</span>
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why this matters</div>
+          <p>Without set_theme, matplotlib charts use a plain gray background with basic fonts. One seaborn call transforms every chart to a clean white grid with muted, professional colors — no per-chart styling needed.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Correlation Heatmap</div>
+        <h4>sns.heatmap — color-coded correlation matrix</h4>
+        <p><code>sns.heatmap()</code> is the star of seaborn in this project. It takes the correlation matrix (a pandas DataFrame of numbers between -1 and +1) and renders it as a color-coded grid. Warm red = positive correlation, cool blue = negative, white = no relationship. Numbers are annotated in each cell.</p>
+        <div class="code-snippet">
+corr = df.<span class="fn">select_dtypes</span>(include=<span class="st">'number'</span>).<span class="fn">corr</span>()<br>
+sns.<span class="fn">heatmap</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;corr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;annot=<span class="nm">True</span>,    <span class="cm"># show numbers inside cells</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;fmt=<span class="st">".2f"</span>,    <span class="cm"># 2 decimal places</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;cmap=<span class="st">"coolwarm"</span>,  <span class="cm"># red-white-blue color scale</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;vmin=<span class="nm">-1</span>, vmax=<span class="nm">1</span>  <span class="cm"># fixed color range</span><br>
+)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — Why seaborn Instead of Raw matplotlib?</div>
+        <h4>Higher-level API = less code for better results</h4>
+        <p>Drawing a proper heatmap with raw matplotlib would require manually calculating color mappings, drawing a grid of rectangles, placing text annotations, and adding a colorbar — roughly 40 lines of code. <code>sns.heatmap()</code> does all of that in one line. seaborn's value is in abstracting complex chart types into simple function calls.</p>
+        <div class="why-box">
+          <div class="why-label">Seaborn vs Matplotlib</div>
+          <p>Think of seaborn as a specialized toolkit built on matplotlib's foundation. matplotlib gives you raw drawing primitives; seaborn gives you ready-made statistical chart types. They work together — seaborn uses matplotlib under the hood and outputs to matplotlib figures.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── plotly ── -->
+<div id="page-lib-plotly" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>✨ <span>plotly</span></h1>
+      <p class="subtitle">The interactive charting engine behind the Dash dashboard — charts with hover tooltips, zoom, pan, and click events, rendered in the browser.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#e8f5e9;">✨</div>
+      <div class="lib-detail-meta">
+        <h2>plotly</h2>
+        <p class="lib-tagline">Interactive graphing library. Charts that live in the browser with full interactivity.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Interactive Charts</span><span class="usage-pill">Hover Tooltips</span><span class="usage-pill">Zoom & Pan</span><span class="usage-pill">Browser Rendering</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install plotly</div></div>
+      <div class="info-card"><div class="ic-label">Used In Files</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">dashboard.py</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How plotly is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — plotly.express (px) API</div>
+        <h4>One-line interactive charts from DataFrames</h4>
+        <p>The project uses <code>plotly.express</code> — the high-level plotly API. <code>px.bar()</code>, <code>px.line()</code>, <code>px.scatter()</code>, <code>px.pie()</code> each accept a DataFrame and column names directly, and return a fully interactive chart object in one function call.</p>
+        <div class="code-snippet">
+<span class="kw">import</span> plotly.express <span class="kw">as</span> px<br><br>
+fig = px.<span class="fn">bar</span>(df, x=<span class="st">'Category'</span>, y=<span class="st">'Sales'</span>, title=<span class="st">'Sales by Category'</span>)<br>
+fig = px.<span class="fn">line</span>(monthly, x=<span class="st">'Month'</span>, y=<span class="st">'Sales'</span>)<br>
+fig = px.<span class="fn">scatter</span>(df, x=<span class="st">'Sales'</span>, y=<span class="st">'Profit'</span>, color=<span class="st">'Category'</span>)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Interactivity Built-in</div>
+        <h4>Hover, zoom, pan — no extra code needed</h4>
+        <p>Every plotly chart automatically includes: hover tooltips showing exact values, mouse-wheel zoom, click-and-drag pan, double-click to reset zoom, and a toolbar with download and autoscale buttons. These features require zero additional code — they are built into every plotly figure by default.</p>
+        <div class="why-box">
+          <div class="why-label">plotly vs matplotlib: the key difference</div>
+          <p>matplotlib creates <em>static images</em> (PNG files). plotly creates <em>interactive HTML+JavaScript objects</em> that live in the browser. The user can explore the data themselves — hover over bars to see exact values, zoom into a trend spike, filter categories by clicking the legend.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — Inside Dash Callbacks</div>
+        <h4>Callbacks return plotly figures to update the dashboard</h4>
+        <p>Every Dash callback function returns a plotly <code>fig</code> object. Dash knows how to take a plotly figure and render it as an interactive chart inside a <code>dcc.Graph</code> component on the web page. This is the bridge between the Python data logic and the browser display.</p>
+        <div class="code-snippet">
+<span class="kw">def</span> <span class="fn">update_chart</span>(selected_region):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filtered = df[df[<span class="st">'Region'</span>] <span class="op">==</span> selected_region]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fig = px.<span class="fn">bar</span>(filtered, x=<span class="st">'Category'</span>, y=<span class="st">'Sales'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> fig  <span class="cm"># Dash renders this in the browser</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── dash ── -->
+<div id="page-lib-dash" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>🌐 <span>dash</span></h1>
+      <p class="subtitle">The Python web framework that turns plotly charts into a full interactive web application — no JavaScript, no HTML templates required.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#e3f2fd;">🌐</div>
+      <div class="lib-detail-meta">
+        <h2>dash</h2>
+        <p class="lib-tagline">Python web framework for analytical web applications. Built on Flask + Plotly + React.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Web App Framework</span><span class="usage-pill">Callbacks</span><span class="usage-pill">Layout</span><span class="usage-pill">Local Server</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install dash</div></div>
+      <div class="info-card"><div class="ic-label">Used In Files</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">dashboard.py</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How dash is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — App Initialization</div>
+        <h4>Creating the Dash application object</h4>
+        <p>The entire dashboard starts with one line: <code>app = dash.Dash(__name__, ...)</code>. This creates a Flask web server under the hood, registers all the necessary JavaScript and CSS files for Dash to work in the browser, and returns the app object that you configure throughout the file.</p>
+        <div class="code-snippet">
+app = dash.<span class="fn">Dash</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;__name__,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;external_stylesheets=[dbc.themes.BOOTSTRAP]<br>
+)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Layout System (app.layout)</div>
+        <h4>Defining the page structure in Python</h4>
+        <p>Dash provides its own component library (<code>dash.html</code> and <code>dash.dcc</code>) that mirrors HTML elements. You compose the page as nested Python objects — no HTML file required. <code>dcc.Graph</code> holds a chart; <code>dcc.Dropdown</code> creates a filter control; <code>html.Div</code> is like a &lt;div&gt; tag.</p>
+        <div class="code-snippet">
+app.layout = html.<span class="fn">Div</span>([<br>
+&nbsp;&nbsp;&nbsp;&nbsp;html.<span class="fn">H1</span>(<span class="st">"Sales Dashboard"</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dcc.<span class="fn">Dropdown</span>(id=<span class="st">'region-filter'</span>, options=[...]),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dcc.<span class="fn">Graph</span>(id=<span class="st">'sales-chart'</span>)<br>
+])
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — The Callback System</div>
+        <h4>The reactive glue between filters and charts</h4>
+        <p>Dash's <code>@app.callback</code> decorator is what makes the dashboard "live". It declares: "when the value of component X changes, call this Python function and write its return value to component Y". When a user selects a region from the dropdown, Dash sends the value to the server, runs the callback, gets back a new chart, and updates the page — all automatically.</p>
+        <div class="code-snippet">
+<span class="kw">from</span> dash <span class="kw">import</span> Input, Output<br><br>
+@app.<span class="fn">callback</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">Output</span>(<span class="st">'sales-chart'</span>, <span class="st">'figure'</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">Input</span>(<span class="st">'region-filter'</span>, <span class="st">'value'</span>)<br>
+)<br>
+<span class="kw">def</span> <span class="fn">update_chart</span>(region): ...<br>
+<span class="cm"># Filter changes → function runs → chart updates</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 4 — Running the Server</div>
+        <h4>app.run_server() launches Flask on port 8050</h4>
+        <p>Calling <code>app.run_server(debug=True)</code> starts a local Flask development server. With <code>debug=True</code>, any changes you make to the Python file automatically reload the server without restarting — useful during development. The dashboard is accessible at <code>http://127.0.0.1:8050</code>.</p>
+        <div class="code-snippet">
+app.<span class="fn">run_server</span>(debug=<span class="nm">True</span>, host=<span class="st">'127.0.0.1'</span>, port=<span class="nm">8050</span>)<br>
+<span class="cm"># Terminal: Dash is running on http://127.0.0.1:8050/</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── dash-bootstrap-components ── -->
+<div id="page-lib-dbc" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>🎨 dash-bootstrap-<span>components</span></h1>
+      <p class="subtitle">Brings Bootstrap's professional grid system and UI components into Dash, making the dashboard responsive and polished without writing any CSS.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#fafafa; border:1px solid #eee;">🎨</div>
+      <div class="lib-detail-meta">
+        <h2>dash-bootstrap-components</h2>
+        <p class="lib-tagline">Bootstrap CSS components wrapped as Dash Python objects. Responsive layouts instantly.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Grid Layout</span><span class="usage-pill">Responsive Design</span><span class="usage-pill">Cards</span><span class="usage-pill">Bootstrap Themes</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install dash-bootstrap-components</div></div>
+      <div class="info-card"><div class="ic-label">Used In Files</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">dashboard.py</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How dash-bootstrap-components is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — Load the Bootstrap Theme</div>
+        <h4>One stylesheet replaces hundreds of lines of CSS</h4>
+        <p>By passing <code>dbc.themes.BOOTSTRAP</code> as an external stylesheet when creating the Dash app, the full Bootstrap 5 CSS framework is loaded. This provides a complete visual foundation: typography, spacing, colors, buttons, and responsive breakpoints — all for free.</p>
+        <div class="code-snippet">
+app = dash.<span class="fn">Dash</span>(__name__,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;external_stylesheets=[dbc.themes.BOOTSTRAP]<br>
+)
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Responsive Grid (Container → Row → Col)</div>
+        <h4>Bootstrap's 12-column grid system in Python</h4>
+        <p>The layout uses <code>dbc.Container</code>, <code>dbc.Row</code>, and <code>dbc.Col</code> — which map exactly to Bootstrap's <code>.container</code>, <code>.row</code>, and <code>.col-md-X</code> CSS classes. The <code>md=</code> parameter sets how many columns wide each element is on medium+ screens (out of 12). On mobile, columns stack automatically.</p>
+        <div class="code-snippet">
+dbc.<span class="fn">Row</span>([<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">Col</span>(dropdown_filter, md=<span class="nm">3</span>),   <span class="cm"># 3/12 = 25% width</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">Col</span>(chart_component, md=<span class="nm">9</span>),  <span class="cm"># 9/12 = 75% width</span><br>
+])
+        </div>
+        <div class="why-box">
+          <div class="why-label">Why use dbc instead of plain html.Div?</div>
+          <p>You could build the same layout with plain <code>html.Div</code> and custom CSS, but that would require writing and maintaining CSS files. dbc gives you Bootstrap's battle-tested, responsive grid as ready-made Python components — no CSS needed.</p>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — Cards for Chart Panels</div>
+        <h4>dbc.Card gives each chart a framed panel</h4>
+        <p>Each chart in the dashboard is wrapped in a <code>dbc.Card</code> component — which renders as a white panel with a subtle border and shadow. This visually separates charts from each other and gives the dashboard a structured, app-like appearance without any custom CSS.</p>
+        <div class="code-snippet">
+dbc.<span class="fn">Card</span>([<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">CardHeader</span>(<span class="st">"Sales by Region"</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dbc.<span class="fn">CardBody</span>(dcc.<span class="fn">Graph</span>(id=<span class="st">'region-chart'</span>))<br>
+], className=<span class="st">"mb-4"</span>)
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── openpyxl ── -->
+<div id="page-lib-openpyxl" class="page detail-page">
+  <div class="detail-header">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <div class="file-badge">Library · Python Package</div>
+      <h1>📋 <span>openpyxl</span></h1>
+      <p class="subtitle">The silent workhorse behind pandas' Excel support — it reads and writes .xlsx files, and must be installed even though you never call it directly in the code.</p>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="lib-detail-hero">
+      <div class="lib-detail-icon" style="background:#fff8e1;">📋</div>
+      <div class="lib-detail-meta">
+        <h2>openpyxl</h2>
+        <p class="lib-tagline">Python library to read/write Excel 2010+ (.xlsx) files. Used as pandas' Excel engine.</p>
+        <div class="usage-pills">
+          <span class="usage-pill">Excel Reading</span><span class="usage-pill">Excel Writing</span><span class="usage-pill">pandas Engine</span><span class="usage-pill">XLSX Format</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-label">Install Command</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pip install openpyxl</div></div>
+      <div class="info-card"><div class="ic-label">Used By</div><div class="ic-value" style="font-family:'DM Mono',monospace;font-size:0.85rem;">pandas internally (not called directly)</div></div>
+    </div>
+
+    <div class="detail-section" style="margin-top:40px;">
+      <div class="detail-section-title">How openpyxl is Used in This Project</div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 1 — Why You Need It Even Without Calling It</div>
+        <h4>pandas delegates Excel I/O to openpyxl</h4>
+        <p>When you call <code>pd.read_excel('file.xlsx')</code>, pandas does not have its own Excel parser built in. Instead, it checks if openpyxl is installed and uses it as the "engine" to decode the .xlsx binary format. If openpyxl is not installed, <code>pd.read_excel()</code> will throw a <code>ModuleNotFoundError</code> and refuse to run.</p>
+        <div class="code-snippet">
+<span class="cm"># This line requires openpyxl to be installed:</span><br>
+df = pd.<span class="fn">read_excel</span>(<span class="st">'data/sample_data.xlsx'</span>)<br><br>
+<span class="cm"># If openpyxl is missing, you'll see:</span><br>
+<span class="cm"># ModuleNotFoundError: Missing optional dependency 'openpyxl'</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 2 — Writing Excel Files (to_excel)</div>
+        <h4>generate_sample_data.py saves via openpyxl too</h4>
+        <p><code>df.to_excel()</code> in <code>generate_sample_data.py</code> also uses openpyxl internally — this time for writing. openpyxl constructs the .xlsx file format (which is actually a ZIP archive containing XML files) and writes it to disk. The result is a proper Excel file that opens in Microsoft Excel, Google Sheets, or LibreOffice.</p>
+        <div class="code-snippet">
+<span class="cm"># Also uses openpyxl under the hood:</span><br>
+df.<span class="fn">to_excel</span>(<span class="st">'data/sample_data.xlsx'</span>, index=<span class="nm">False</span>)<br><br>
+<span class="cm"># .xlsx is actually a ZIP of XML files:</span><br>
+<span class="cm"># xl/worksheets/sheet1.xml  ← the actual cell data</span>
+        </div>
+      </div>
+
+      <div class="step-detail-card">
+        <div class="step-number">Usage 3 — The Dependency Chain</div>
+        <h4>Understanding why it's in requirements.txt</h4>
+        <p>openpyxl is an <strong>optional dependency</strong> of pandas — pandas doesn't install it automatically because not everyone needs Excel support. That's why it must be explicitly listed in <code>requirements.txt</code>. When you run <code>pip install -r requirements.txt</code>, both pandas and openpyxl are installed, ensuring the full Excel read/write pipeline works.</p>
+        <div class="code-snippet">
+<span class="cm"># requirements.txt</span><br>
+pandas<br>
+numpy<br>
+matplotlib<br>
+seaborn<br>
+plotly<br>
+dash<br>
+dash-bootstrap-components<br>
+openpyxl    <span class="cm"># ← required for pandas Excel support</span>
+        </div>
+        <div class="why-box">
+          <div class="why-label">Key insight</div>
+          <p>openpyxl is the only library in this project that you never <code>import</code> directly in your code — but it is absolutely essential. Forgetting to include it in requirements.txt is one of the most common deployment bugs for projects that use Excel files.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-back">
+      <button class="back-btn" onclick="showPage('page-home')">← Back to Main Page</button>
+      <p>Made by <strong>Ajay</strong> & <strong>Shanmukh Jagadeesh</strong></p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════ -->
+<script>
+  function showPage(id) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    // Show target page
+    document.getElementById(id).classList.add('active');
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Trigger reveal animations for new page
+    setTimeout(() => {
+      document.querySelectorAll('#' + id + ' .reveal').forEach(el => {
+        el.classList.add('visible');
+      });
+    }, 100);
+  }
+
+  // Scroll reveal for home page
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('#page-home .reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
